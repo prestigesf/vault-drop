@@ -1,0 +1,10 @@
+{
+	"id": "vault-drop",
+	"name": "Vault Drop",
+	"version": "1.0.0",
+	"minAppVersion": "1.4.0",
+	"description": "Dump pasted Apple Notes into your vault as Markdown files. Works on iPhone.",
+	"author": "prestigesf",
+	"authorUrl": "https://github.com/prestigesf",
+	"isDesktopOnly": false
+}
