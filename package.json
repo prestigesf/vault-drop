@@ -1,6 +1,6 @@
 {
 	"name": "vault-drop",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Dump pasted Apple Notes into an Obsidian vault as Markdown.",
 	"main": "main.js",
 	"type": "module",
