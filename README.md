@@ -1,23 +1,37 @@
 # Vault Drop
 
-Obsidian plugin that dumps pasted Apple Notes into your vault as Markdown.
+Obsidian plugin that dumps Apple Notes into your vault as Markdown.
 
-Works on **iPhone**. Apple does not let a plugin read the Notes app, so you paste (or run the iOS Shortcut), then dump.
+Works on **iPhone** (paste dump) and **Mac** (osascript bridge + optional Ollama tags).
 
 ## What it does
 
 - Ribbon inbox → dump modal
 - Command palette → **Dump pasted notes**
-- Command palette → **Hello world** (sample notice)
-- Settings: dump folder (`Apple Notes`), frontmatter stamp, split on `---`
+- Optional desktop Ollama: tags + `[[wikilinks]]` from llama3.2
+- Settings: dump folder, frontmatter, split on `---`, Ollama URL/model
+
+## Offline architecture
+
+1. Capture in Apple Notes on the phone
+2. On a Mac: `python3 scripts/sync_notes_to_vault.py` (or the launchd plist every 30 min)
+3. In Obsidian: Vault Drop, Smart Connections (`nomic-embed-text`), Copilot (`llama3.2`) against local Ollama
+
+```sh
+ollama pull llama3.2
+ollama pull nomic-embed-text
+export OBSIDIAN_VAULT_PATH="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Notes"
+python3 scripts/sync_notes_to_vault.py
+```
+
+The bridge **does not run on iPhone**. Phone path: paste into the dump modal.
 
 ## Install on iPhone
 
-1. App Store → Obsidian → create a vault with **Store in iCloud** on
-2. Download `main.js`, `manifest.json`, and `styles.css` from this repo
-3. In Files, put them in `iCloud Drive/Obsidian/[Vault]/.obsidian/plugins/vault-drop/`
-4. Obsidian → Settings → Community plugins → turn restricted mode off → enable **Vault Drop**
-5. Ribbon inbox → paste from Notes → Dump
+1. Settings → Community plugins → Turn on community plugins
+2. Browse → install **BRAT** → Enable
+3. BRAT → Add beta plugin → `prestigesf/vault-drop`
+4. Enable **Vault Drop**
 
 ## Develop
 
@@ -28,7 +42,5 @@ cd vault-drop
 npm install
 npm run dev
 ```
-
-Enable **Vault Drop** in Community plugins. Reload after `manifest.json` changes.
 
 Built from the [official sample plugin](https://github.com/obsidianmd/obsidian-sample-plugin) tutorial.
