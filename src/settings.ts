@@ -5,12 +5,18 @@ export interface VaultDropSettings {
 	folder: string;
 	frontmatter: boolean;
 	splitOnRule: boolean;
+	ollamaEnabled: boolean;
+	ollamaHost: string;
+	ollamaModel: string;
 }
 
 export const DEFAULT_SETTINGS: VaultDropSettings = {
 	folder: "Apple Notes",
 	frontmatter: true,
 	splitOnRule: true,
+	ollamaEnabled: false,
+	ollamaHost: "http://127.0.0.1:11434",
+	ollamaModel: "llama3.2",
 };
 
 export class VaultDropSettingTab extends PluginSettingTab {
@@ -58,6 +64,49 @@ export class VaultDropSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.splitOnRule)
 					.onChange(async (value) => {
 						this.plugin.settings.splitOnRule = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		containerEl.createEl("h3", { text: "Local Ollama" });
+		containerEl.createEl("p", {
+			cls: "setting-item-description",
+			text: "Desktop only. Tags and [[wikilinks]] from llama3.2. Phone dumps skip this.",
+		});
+
+		new Setting(containerEl)
+			.setName("Enrich dumps with Ollama")
+			.setDesc("Needs Ollama running locally. Fails open if it is not.")
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.ollamaEnabled)
+					.onChange(async (value) => {
+						this.plugin.settings.ollamaEnabled = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Ollama URL")
+			.addText((text) =>
+				text
+					.setPlaceholder("http://127.0.0.1:11434")
+					.setValue(this.plugin.settings.ollamaHost)
+					.onChange(async (value) => {
+						this.plugin.settings.ollamaHost =
+							value.trim() || "http://127.0.0.1:11434";
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Model")
+			.addText((text) =>
+				text
+					.setPlaceholder("llama3.2")
+					.setValue(this.plugin.settings.ollamaModel)
+					.onChange(async (value) => {
+						this.plugin.settings.ollamaModel = value.trim() || "llama3.2";
 						await this.plugin.saveSettings();
 					}),
 			);
