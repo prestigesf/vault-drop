@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.user.vault-drop-notesync</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/python3</string>
+		<string>/Users/YOUR_USERNAME/scripts/sync_notes_to_vault.py</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>OBSIDIAN_VAULT_PATH</key>
+		<string>/Users/YOUR_USERNAME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Notes</string>
+		<key>SYNC_FOLDER_NAME</key>
+		<string>Apple Notes</string>
+		<key>OLLAMA_ENABLED</key>
+		<string>1</string>
+		<key>OLLAMA_MODEL</key>
+		<string>llama3.2</string>
+	</dict>
+	<key>StartInterval</key>
+	<integer>1800</integer>
+	<key>RunAtLoad</key>
+	<true/>
+</dict>
+</plist>
