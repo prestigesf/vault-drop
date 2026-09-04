@@ -1,5 +1,6 @@
-import { Modal, Notice, Plugin, Setting, TFolder } from "obsidian";
+import { Modal, Notice, Platform, Plugin, Setting, TFolder } from "obsidian";
 import { parseNotes, filenameFor, withFrontmatter } from "./parse";
+import { enrichWithOllama } from "./ollama";
 import {
 	DEFAULT_SETTINGS,
 	VaultDropSettingTab,
@@ -54,11 +55,24 @@ export default class VaultDropPlugin extends Plugin {
 
 		const folder = this.settings.folder.replace(/^\/+|\/+$/g, "");
 		await this.ensureFolder(folder);
+		const useOllama = this.settings.ollamaEnabled && Platform.isDesktopApp;
 
 		let written = 0;
 		for (const note of notes) {
 			const path = await this.uniquePath(folder, filenameFor(note.title));
-			const content = withFrontmatter(note.body, this.settings.frontmatter);
+			const meta =
+				useOllama
+					? (await enrichWithOllama(
+							note.body,
+							this.settings.ollamaHost,
+							this.settings.ollamaModel,
+						)) ?? undefined
+					: undefined;
+			const content = withFrontmatter(
+				note.body,
+				this.settings.frontmatter,
+				meta,
+			);
 			await this.app.vault.create(path, content);
 			written += 1;
 		}
