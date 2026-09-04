@@ -3,6 +3,11 @@ export interface ParsedNote {
 	body: string;
 }
 
+export interface NoteMeta {
+	tags?: string[];
+	links?: string[];
+}
+
 export function filenameFor(title: string): string {
 	const cleaned = title
 		.replace(/[/\\:*?"<>|#[\]]/g, "-")
@@ -38,15 +43,36 @@ export function parseNotes(raw: string, splitOnRule: boolean): ParsedNote[] {
 			};
 		}
 
-		const fallback =
-			first.slice(0, 48) || `Note ${i + 1}`;
+		const fallback = first.slice(0, 48) || `Note ${i + 1}`;
 		return { title: fallback, body: chunk };
 	});
 }
 
-export function withFrontmatter(body: string, enabled: boolean): string {
-	if (!enabled) return body.endsWith("\n") ? body : `${body}\n`;
+export function withFrontmatter(
+	body: string,
+	enabled: boolean,
+	meta?: NoteMeta,
+): string {
+	const padded = body.endsWith("\n") ? body : `${body}\n`;
+	if (!enabled) return padded;
 	const day = new Date().toISOString().slice(0, 10);
-	const block = `---\ndumped: ${day}\nsource: apple-notes\n---\n\n`;
-	return `${block}${body.endsWith("\n") ? body : `${body}\n`}`;
+	const lines = ["---", `dumped: ${day}`, "source: apple-notes"];
+	if (meta?.tags?.length) {
+		lines.push("tags:");
+		for (const tag of meta.tags) lines.push(`  - ${yamlSafe(tag)}`);
+	}
+	lines.push("---", "");
+	let out = `${lines.join("\n")}${padded}`;
+	if (meta?.links?.length) {
+		const wiki = meta.links.map((name) => `[[${name}]]`).join(" · ");
+		out += `\n---\n${wiki}\n`;
+	}
+	return out;
+}
+
+function yamlSafe(value: string): string {
+	if (/[:#{}[\],&*?|>!%@`]/.test(value) || value.includes(" ")) {
+		return JSON.stringify(value);
+	}
+	return value;
 }
